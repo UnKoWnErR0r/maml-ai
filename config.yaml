@@ -1,0 +1,4 @@
+model:
+  input_channels: 1
+  output_classes: 5
+  learning_rate: 0.01
