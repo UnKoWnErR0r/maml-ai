@@ -1,0 +1,19 @@
+# .gitpod.yml
+image:
+  file: .gitpod.Dockerfile
+
+tasks:
+  - name: Install dependencies
+    command: |
+      pip install -r requirements.txt
+      python3 train.py  # This will run training automatically if needed
+
+ports:
+  - port: 8080
+    onOpen: open-preview  # Automatically open in preview mode if needed (e.g., for a web server)
+
+# Optional prebuilds section for faster startup (recommended for complex installs)
+github:
+  prebuilds:
+    master: true
+    branches: true
