@@ -1,62 +1,69 @@
 import torch
 import torch.nn as nn
-import torch.optim as optim
-import torchmeta
-from torchmeta.datasets import Omniglot
-from torchmeta.utils.data import BatchMetaDataLoader
-from model import CNN  # We will define this model next
+from fastai.vision.all import *
+from fastai.callback.core import Callback
 import yaml
 
-def load_config(config_path="config.yaml"):
-    """Load configuration from YAML file."""
-    with open(config_path, "r") as file:
-        return yaml.safe_load(file)
+# Load configuration from config.yaml
+with open('config.yaml', 'r') as file:
+    config = yaml.safe_load(file)
 
-def maml_step(model, data, targets, learning_rate=0.01):
-    """Perform a single MAML update step."""
-    output = model(data)
-    loss = nn.CrossEntropyLoss()(output, targets)
-    gradients = torch.autograd.grad(loss, model.parameters(), create_graph=True)
-    updated_params = list(map(lambda p: p - learning_rate * g, zip(model.parameters(), gradients)))
-    
-    # Apply updated params to a new model copy
-    model_copy = CNN()
-    model_copy.load_state_dict(dict(zip(model.state_dict().keys(), updated_params)))
-    
-    return model_copy, loss
+inner_lr = config['meta_learning']['inner_lr']
+meta_lr = config['meta_learning']['meta_lr']
+epochs = config['meta_learning']['epochs']
 
-def train_maml(model, dataloader, num_epochs=10, learning_rate=0.01):
-    """Train the model using MAML."""
-    optimizer = optim.Adam(model.parameters(), lr=learning_rate)
-    
-    for epoch in range(num_epochs):
-        total_loss = 0
-        for batch in dataloader:
-            support_set, query_set = batch['train'], batch['test']
-            data, targets = support_set['image'], support_set['target']
-            
-            model_copy, loss = maml_step(model, data, targets, learning_rate)
-            optimizer.zero_grad()
-            loss.backward()
-            optimizer.step()
-            
-            total_loss += loss.item()
-        print(f'Epoch {epoch+1}/{num_epochs}, Loss: {total_loss / len(dataloader)}')
+# Define a custom meta-learning model using ResNet18
+class MetaModel(nn.Module):
+    def __init__(self, num_classes=5):
+        super(MetaModel, self).__init__()
+        self.resnet = models.resnet18(pretrained=True)  # A pretrained ResNet
+        self.resnet.fc = nn.Linear(self.resnet.fc.in_features, num_classes)
 
-def main():
-    # Load configuration
-    config = load_config()
-    model = CNN(input_channels=1, output_classes=config["model"]["output_classes"])
+    def forward(self, x):
+        return self.resnet(x)
 
-    # Load the Omniglot dataset
-    dataset = Omniglot(root='data', num_classes_per_task=5, num_samples_per_class=5, meta_train=True)
-    dataloader = BatchMetaDataLoader(dataset, batch_size=4, shuffle=True)
-    
-    # Train the model
-    train_maml(model, dataloader, num_epochs=10, learning_rate=config["model"]["learning_rate"])
+# Custom Callback for Meta-Learning (MAML)
+class MetaLearner(Callback):
+    def __init__(self, model, meta_lr=0.001, inner_lr=0.01):
+        self.model = model
+        self.meta_lr = meta_lr
+        self.inner_lr = inner_lr
 
-    # Save the model after training
-    torch.save(model.state_dict(), "models/maml_model.pth")
+    def before_fit(self):
+        self.inner_optimizer = torch.optim.SGD(self.model.parameters(), lr=self.inner_lr)
+
+    def before_batch(self):
+        # Save original model parameters for meta-gradient computation
+        self.original_params = {name: param.clone() for name, param in self.model.named_parameters()}
+
+    def after_batch(self):
+        # Perform the inner-loop update (task-specific adaptation)
+        self.inner_optimizer.zero_grad()
+        loss = self.learn.loss_func(self.pred, self.yb)
+        loss.backward()
+        self.inner_optimizer.step()
+
+    def after_epoch(self):
+        # Compute the meta-gradient (outer-loop update)
+        meta_optimizer = torch.optim.Adam(self.model.parameters(), lr=self.meta_lr)
+        meta_optimizer.zero_grad()
+        for name, param in self.model.named_parameters():
+            # Compute meta-gradient by comparing with the original params
+            param.grad = (param - self.original_params[name]).detach()
+        meta_optimizer.step()
+        self.model.train()  # Ensure the model is in training mode after each update
+
+# Main function to create the learner and train the model
+def train_model(dls):
+    model = MetaModel(num_classes=5)  # Customize based on your task
+    learner = cnn_learner(dls, model, metrics=accuracy, cbs=[MetaLearner(model, meta_lr, inner_lr)])
+    learner.fit_one_cycle(epochs)  # Train for the specified number of epochs
 
 if __name__ == "__main__":
-    main()
+    # Example of using a DataLoader (assuming you have a dataset ready)
+    # Modify this to your dataset path and configuration
+    path_to_data = "./data"  # Adjust this path accordingly
+    dls = ImageDataLoaders.from_folder(path_to_data, valid_pct=0.2, item_tfms=Resize(224))
+
+    train_model(dls)  # Start training the model
+
