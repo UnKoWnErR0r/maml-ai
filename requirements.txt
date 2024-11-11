@@ -1,11 +1,7 @@
 Flask==2.2.2
-fastai==2.7.0      # Fastai for model building and training
-torch==2.0.0       # PyTorch for neural network support
-torchvision==0.15.1
+fastai==2.7.0  # or whichever version you are using
+torch==2.0.0
+torchvision==0.15.1  # Ensure compatibility between torch and torchvision
 matplotlib==3.7.1
 numpy==1.23.5
-PyYAML==6.0        # For reading config.yaml
-
-
-
-
+PyYAML==6.0  # for reading config.yaml
