@@ -1,25 +1,21 @@
-from flask import Flask, render_template, request, jsonify
-import torch
+from flask import Flask, jsonify, request
+from train import train_model
+from fastai.data.block import DataBlock
+from fastai.vision.data import ImageBlock, CategoryBlock
+from fastai.data.transforms import RandomSplitter
 
 app = Flask(__name__)
 
-# Load your AI model here
-# model = torch.load('path_to_your_model')  # Replace with your model loading code
+@app.route('/train', methods=['POST'])
+def train():
+    # Trigger the training process (adjust as needed for your dataset)
+    path_to_data = "./data"  # Adjust this path to your data location
+    dls = ImageDataLoaders.from_folder(path_to_data, valid_pct=0.2, item_tfms=Resize(224))
 
-@app.route('/')
-def index():
-    return render_template('index.html')
-
-@app.route('/ask', methods=['POST'])
-def ask():
-    user_input = request.json.get('message')
+    # Start training the model
+    train_model(dls)
     
-    # Run the input through your AI model and get the response
-    # For now, we just echo the input as a placeholder
-    ai_response = f"AI Response to: {user_input}"
+    return jsonify({"message": "Training started!"}), 200
 
-    # In reality, you'd pass the `user_input` to your model and return its output
-    return jsonify({"response": ai_response})
-
-if __name__ == '__main__':
-    app.run(debug=True, host='0.0.0.0')
+if __name__ == "__main__":
+    app.run(debug=True, host="0.0.0.0", port=5000)
