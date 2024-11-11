@@ -1,10 +1,10 @@
 image:
-  file: .gitpod.Dockerfile
+  file: .gitpod.Dockerfile  # Make sure this file exists
 
 tasks:
-  - init: pip install -r requirements.txt  # Install dependencies
-  - command: flask run --host=0.0.0.0  # Run the Flask app
+  - init: pip install -r requirements.txt  # Ensure dependencies are installed
+  - command: flask run --host=0.0.0.0   # Start Flask app on port 5000
 
 ports:
-  - port: 5000  # Open port 5000 for Flask
-    onOpen: open-browser  # Automatically open the browser on port 5000
+  - port: 5000  # Expose port 5000 for Flask
+    onOpen: open-browser  # Automatically open the browser once Flask is running
