@@ -1,22 +1,16 @@
-# Ignore Python bytecode files
+# Python bytecode files
+__pycache__/
 *.pyc
 *.pyo
-*.pyd
-__pycache__/
 
-# Ignore Jupyter Notebook checkpoints
+# Jupyter notebook checkpoints
 .ipynb_checkpoints/
 
-# Ignore large data and model files
-data/
-models/
-
-# Ignore virtual environment folder (if using one)
+# Environment and dependency folders
+.env/
+.envrc
 venv/
-env/
+*.egg-info/
 
-# Ignore configuration files (optional)
-config.yaml
-
-# Ignore logs
-*.log
+# Fastai models and dataset caches
+/models/
