@@ -1,9 +1,9 @@
-# .gitpod.Dockerfile
-FROM python:3.9
+FROM gitpod/workspace-full
 
-# Install system dependencies
-RUN apt-get update && apt-get install -y \
-    && apt-get clean
+# Install Python dependencies
+RUN pip install --upgrade pip && pip install -r requirements.txt
 
-# Set up environment
+# Set the default working directory
 WORKDIR /workspace
+
+# Expose port
