@@ -3,5 +3,5 @@ image:
 
 tasks:
   - command: |
-      pip install -r requirements.txt  # Install the dependencies
-      python train.py                  # Run your training script
+      pip install -r requirements.txt   # Install dependencies if not already done
+      python train.py                   # Run the training script
