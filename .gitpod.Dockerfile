@@ -1,7 +1,7 @@
 # Use the Gitpod base workspace image
 FROM gitpod/workspace-full
 
-# Install tzdata to configure the time zone and avoid interactive prompts
+# Set the time zone to Eastern Time (New York)
 USER root  # Switch to root user to run system-level commands
 RUN apt-get update && apt-get install -y tzdata \
     && ln -sf /usr/share/zoneinfo/America/New_York /etc/localtime \
@@ -18,7 +18,7 @@ EXPOSE 5000
 # Set the working directory for your project in the container
 WORKDIR /workspace
 
-# Copy your project files into the container (if not already)
+# Copy the project files into the container
 COPY . /workspace/
 
 # Run Flask app when the container starts
