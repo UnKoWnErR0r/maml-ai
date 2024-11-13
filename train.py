@@ -1,7 +1,6 @@
-import torch
-import torch.nn as nn
-from fastai.vision.all import *
-from fastai.callback.core import Callback
+import tensorflow as tf
+from tensorflow.keras import layers, models
+import numpy as np
 import yaml
 
 # Load configuration from config.yaml
@@ -12,57 +11,50 @@ inner_lr = config['meta_learning']['inner_lr']
 meta_lr = config['meta_learning']['meta_lr']
 epochs = config['meta_learning']['epochs']
 
-# Define a custom meta-learning model using ResNet18
-class MetaModel(nn.Module):
+# Define a custom meta-learning model using ResNet50 (pretrained)
+class MetaModel(tf.keras.Model):
     def __init__(self, num_classes=5):
         super(MetaModel, self).__init__()
-        self.resnet = models.resnet18(pretrained=True)  # A pretrained ResNet
-        self.resnet.fc = nn.Linear(self.resnet.fc.in_features, num_classes)
+        self.resnet = tf.keras.applications.ResNet50(weights='imagenet', include_top=False, input_shape=(224, 224, 3))
+        self.resnet.trainable = False  # Freeze the ResNet layers
+        self.flatten = layers.Flatten()
+        self.dense = layers.Dense(num_classes, activation='softmax')
 
-    def forward(self, x):
-        return self.resnet(x)
+    def call(self, inputs):
+        x = self.resnet(inputs)
+        x = self.flatten(x)
+        x = self.dense(x)
+        return x
 
-# Custom Callback for Meta-Learning (MAML)
-class MetaLearner(Callback):
+# Define a custom callback for meta-learning (MAML)
+class MetaLearner(tf.keras.callbacks.Callback):
     def __init__(self, model, meta_lr=0.001, inner_lr=0.01):
+        super(MetaLearner, self).__init__()
         self.model = model
         self.meta_lr = meta_lr
         self.inner_lr = inner_lr
 
-    def before_fit(self):
-        self.inner_optimizer = torch.optim.SGD(self.model.parameters(), lr=self.inner_lr)
+    def on_epoch_end(self, epoch, logs=None):
+        # Placeholder for meta-learning updates (can be implemented further)
+        print(f"Epoch {epoch + 1}/{epochs} - Meta Learning Step")
+        # You can apply inner-loop updates or adjust weights here
 
-    def before_batch(self):
-        # Save original model parameters for meta-gradient computation
-        self.original_params = {name: param.clone() for name, param in self.model.named_parameters()}
+# Function to train the model
+def train_model():
+    # Define the model
+    model = MetaModel(num_classes=5)
+    model.compile(optimizer=tf.keras.optimizers.Adam(learning_rate=meta_lr),
+                  loss='categorical_crossentropy', metrics=['accuracy'])
 
-    def after_batch(self):
-        # Perform the inner-loop update (task-specific adaptation)
-        self.inner_optimizer.zero_grad()
-        loss = self.learn.loss_func(self.pred, self.yb)
-        loss.backward()
-        self.inner_optimizer.step()
+    # Example of generating random data for training (replace with real data)
+    X_train = np.random.rand(1000, 224, 224, 3)  # Example data (1000 images, 224x224x3)
+    y_train = np.random.randint(0, 5, size=(1000,))  # Random labels (0-4)
 
-    def after_epoch(self):
-        # Compute the meta-gradient (outer-loop update)
-        meta_optimizer = torch.optim.Adam(self.model.parameters(), lr=self.meta_lr)
-        meta_optimizer.zero_grad()
-        for name, param in self.model.named_parameters():
-            # Compute meta-gradient by comparing with the original params
-            param.grad = (param - self.original_params[name]).detach()
-        meta_optimizer.step()
-        self.model.train()  # Ensure the model is in training mode after each update
+    # Convert labels to one-hot encoding
+    y_train = tf.keras.utils.to_categorical(y_train, num_classes=5)
 
-# Main function to create the learner and train the model
-def train_model(dls):
-    model = MetaModel(num_classes=5)  # Customize based on your task
-    learner = cnn_learner(dls, model, metrics=accuracy, cbs=[MetaLearner(model, meta_lr, inner_lr)])
-    learner.fit_one_cycle(epochs)  # Train for the specified number of epochs
+    # Train the model with meta-learning callback
+    model.fit(X_train, y_train, epochs=epochs, batch_size=32, callbacks=[MetaLearner(model, meta_lr, inner_lr)])
 
 if __name__ == "__main__":
-    # Example of using a DataLoader (assuming you have a dataset ready)
-    # Modify this to your dataset path and configuration
-    path_to_data = "./data"  # Adjust this path accordingly
-    dls = ImageDataLoaders.from_folder(path_to_data, valid_pct=0.2, item_tfms=Resize(224))
-
-    train_model(dls)  # Start training the model
+    train_model()  # Start training the model
