@@ -1,10 +1,14 @@
 image:
-  file: .gitpod.Dockerfile  # Make sure this file exists
+  file: .gitpod.Dockerfile  # Use the custom Dockerfile
 
 tasks:
-  - init: pip install -r requirements.txt  # Ensure dependencies are installed
-  - command: flask run --host=0.0.0.0   # Start Flask app on port 5000
+  - init: pip install -r requirements.txt  # Install dependencies before workspace is ready
+    command: python app.py  # Start Flask app on workspace startup
 
 ports:
-  - port: 5000  # Expose port 5000 for Flask
-    onOpen: open-browser  # Automatically open the browser once Flask is running
+  - port: 5000  # Expose the port Flask is running on
+
+vscode:
+  extensions:
+    - ms-python.python  # Python extension for VSCode in Gitpod
+    - ms-toolsai.jupyter  # Jupyter extension if needed
