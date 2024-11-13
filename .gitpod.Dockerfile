@@ -1,17 +1,10 @@
-# Use an official Python runtime as a parent image
 FROM python:3.12-slim
 
-# Set the timezone to New York (Eastern Time)
 RUN apt-get update && apt-get install -y tzdata && ln -sf /usr/share/zoneinfo/America/New_York /etc/localtime && dpkg-reconfigure -f noninteractive tzdata
 
-# Set the working directory
 WORKDIR /workspace
 
-# Copy the requirements.txt file into the container
-COPY requirements.txt /workspace/
+# Directly install requirements (assuming requirements.txt is already in the workspace)
+RUN pip install --no-cache-dir tensorflow==2.14.0 numpy==1.23.5 pyyaml==6.0 matplotlib==3.7.1 scikit-learn==1.2.2
 
-# Install any necessary dependencies
-RUN pip install --no-cache-dir -r requirements.txt
-
-# Expose Flask's default port
 EXPOSE 5000
