@@ -1,27 +1,11 @@
-# Use the official Python base image
-FROM python:3.12.6
+FROM gitpod/workspace-python3:latest
 
-# Set environment variables to non-interactive for apt-get
-ENV DEBIAN_FRONTEND=noninteractive
-
-# Switch to root user to install system packages
-USER root
-
-# Update the apt package list and install tzdata for time zone configuration
-RUN apt-get update && apt-get install -y tzdata \
-    && ln -sf /usr/share/zoneinfo/America/New_York /etc/localtime \
-    && dpkg-reconfigure -f noninteractive tzdata
-
-# Install Python dependencies from requirements.txt
-COPY requirements.txt .
+# Install TensorFlow and other dependencies
 RUN pip install --upgrade pip
-RUN pip install -r requirements.txt
+RUN pip install tensorflow==2.14.0 numpy==1.23.5 pyyaml==6.0 matplotlib==3.7.1 scikit-learn==1.2.2
 
-# Copy the rest of the application code
-COPY . /workspace/
+# Set working directory
+WORKDIR /workspace
 
-# Expose Flask's default port (5000)
+# Expose Flask's default port
 EXPOSE 5000
-
-# Run the Flask app
-CMD ["python", "app.py"]
