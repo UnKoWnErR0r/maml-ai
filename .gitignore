@@ -3,14 +3,19 @@ __pycache__/
 *.pyc
 *.pyo
 
-# Jupyter notebook checkpoints
-.ipynb_checkpoints/
-
-# Environment and dependency folders
-.env/
-.envrc
+# Virtual environment
 venv/
-*.egg-info/
+env/
+ENV/
+.venv/
 
-# Fastai models and dataset caches
-/models/
+# Flask specific
+instance/
+.webassets-cache
+
+# IDEs
+.vscode/
+.idea/
+
+# Gitpod-specific
+.gitpod-*
