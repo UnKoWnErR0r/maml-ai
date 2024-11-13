@@ -1,17 +1,16 @@
-# Use a generic Python 3.12 image from Docker Hub
+# Use an official Python runtime as a parent image
 FROM python:3.12-slim
 
-# Install required dependencies
-RUN apt-get update && apt-get install -y \
-    tzdata \
-    && ln -sf /usr/share/zoneinfo/America/New_York /etc/localtime \
-    && dpkg-reconfigure -f noninteractive tzdata
+# Set the timezone to New York (Eastern Time)
+RUN apt-get update && apt-get install -y tzdata && ln -sf /usr/share/zoneinfo/America/New_York /etc/localtime && dpkg-reconfigure -f noninteractive tzdata
 
-# Set working directory
+# Set the working directory
 WORKDIR /workspace
 
-# Install Python dependencies from requirements.txt
+# Copy the requirements.txt file into the container
 COPY requirements.txt /workspace/
+
+# Install any necessary dependencies
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Expose Flask's default port
