@@ -1,21 +1,10 @@
-# Python bytecode files
 __pycache__/
 *.pyc
 *.pyo
-
-# Virtual environment
+*.pyd
 venv/
 env/
-ENV/
-.venv/
-
-# Flask specific
-instance/
-.webassets-cache
-
-# IDEs
-.vscode/
 .idea/
-
-# Gitpod-specific
-.gitpod-*
+*.db
+*.sqlite3
+*.log
