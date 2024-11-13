@@ -1,16 +1,13 @@
-# Flask for web server
+# Web framework
 flask==2.2.2
 
-# PyTorch and torchvision for deep learning
-torch==2.0.1  # PyTorch version compatible with Fastai
-torchvision==0.15.2  # torchvision version that works with PyTorch 2.0.1
+# PyTorch and related packages
+torch==2.0.1
+torchvision==0.15.2
+fastai==2.7.12
 
-# Fastai for training deep learning models
-fastai==2.7.0
+# Common libraries for data science and AI
+matplotlib==3.7.1
+numpy==1.23.5
 
-# Other dependencies for scientific computing and image processing
-matplotlib==3.7.1  # Plotting library for graphs and images
-numpy==1.23.5  # Core numerical library
-pillow==8.4.0  # Image handling library
-requests==2.28.1  # For making HTTP requests (if applicable)
-PyYAML==6.0  # For handling YAML files (if applicable)
+# Add any additional dependencies that are needed
