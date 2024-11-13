@@ -1,15 +1,14 @@
 # Use the Gitpod base workspace image
 FROM gitpod/workspace-full
 
-# Install Python dependencies from requirements.txt
-COPY requirements.txt /workspace/
-
 # Install tzdata to configure the time zone and avoid interactive prompts
+USER root  # Switch to root user to run system-level commands
 RUN apt-get update && apt-get install -y tzdata \
     && ln -sf /usr/share/zoneinfo/America/New_York /etc/localtime \
     && dpkg-reconfigure -f noninteractive tzdata
 
-# Install Python 3 dependencies
+# Install Python dependencies from requirements.txt
+COPY requirements.txt /workspace/
 RUN pip install --upgrade pip  # Upgrade pip first
 RUN pip install -r /workspace/requirements.txt  # Install dependencies
 
