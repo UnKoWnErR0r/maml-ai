@@ -1,13 +1,5 @@
-# Web framework
-flask==2.2.2
-
-# PyTorch and related packages
-torch==2.0.1
-torchvision==0.15.2
-fastai==2.7.12
-
-# Common libraries for data science and AI
-matplotlib==3.7.1
-numpy==1.23.5
-
-# Add any additional dependencies that are needed
+tensorflow==2.14.0      # Install TensorFlow (specify the version you want to use)
+numpy==1.23.5            # For numerical operations (required for TensorFlow)
+pyyaml==6.0              # For reading YAML config files
+matplotlib==3.7.1        # Optional: For plotting and visualizing training data or results
+scikit-learn==1.2.2      # Optional: For metrics or other machine learning utilities
