@@ -66,4 +66,3 @@ if __name__ == "__main__":
     dls = ImageDataLoaders.from_folder(path_to_data, valid_pct=0.2, item_tfms=Resize(224))
 
     train_model(dls)  # Start training the model
-
