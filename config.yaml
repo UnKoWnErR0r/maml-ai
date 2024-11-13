@@ -1,4 +1,16 @@
-meta_learning:
-  inner_lr: 0.01   # Learning rate for the inner loop (task-specific updates)
-  meta_lr: 0.001   # Learning rate for the outer loop (meta-update)
-  epochs: 5        # Number of epochs for training
+# Configuration settings for the app
+
+flask:
+  host: "0.0.0.0"
+  port: 5000
+
+model:
+  name: "YourModelName"
+  version: "1.0"
+
+logging:
+  level: "INFO"
+  file: "app.log"
+
+# Timezone (already set in Dockerfile, but can be useful for logs)
+timezone: "America/New_York"
