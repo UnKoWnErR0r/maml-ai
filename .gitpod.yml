@@ -1,7 +1,7 @@
 image:
-  file: .gitpod.Dockerfile
+  file: .gitpod.Dockerfile   # Pointing to the custom Dockerfile
 
 tasks:
   - command: |
-      pip install -r requirements.txt
-      python train.py
+      pip install -r requirements.txt  # Install the dependencies
+      python train.py                  # Run your training script
