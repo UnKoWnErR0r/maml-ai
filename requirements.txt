@@ -1,5 +1,7 @@
-tensorflow==2.14.0      # Install TensorFlow (specify the version you want to use)
-numpy==1.23.5            # For numerical operations (required for TensorFlow)
-pyyaml==6.0              # For reading YAML config files
-matplotlib==3.7.1        # Optional: For plotting and visualizing training data or results
-scikit-learn==1.2.2      # Optional: For metrics or other machine learning utilities
+Flask==2.2.2
+tensorflow==2.14.0  # Updated to the latest stable version of TensorFlow
+torchvision==0.15.1  # Make sure this is compatible with TensorFlow if needed, otherwise use the CPU version of TensorFlow
+numpy==1.23.5
+matplotlib==3.7.1
+pyyaml==6.0  # For reading YAML files
+scikit-learn==1.2.2  # For any machine learning operations you may need
